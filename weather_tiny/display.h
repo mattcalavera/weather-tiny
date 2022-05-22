@@ -141,7 +141,7 @@ void init_display() {
     Serial.print("init_display...");
     SPI.begin(SPI_CLK, SPI_MISO, SPI_MOSI, ELINK_SS);
     // enable diagnostic output on Serial 
-    display.init(115200);
+    display.init();
     display.setRotation(3);
     display.setTextWrap(false);
     display.fillScreen(GxEPD_WHITE);
