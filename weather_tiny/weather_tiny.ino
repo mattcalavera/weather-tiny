@@ -4,8 +4,8 @@
 #include <SPI.h>
 #include <GxEPD.h>
 
-#include <GxGDE0213B72B/GxGDE0213B72B.h> // 2.13" b/w
-// #include <GxDEPG0213BN/GxDEPG0213BN.h>  // 2.13" b/w newer panel
+//#include <GxGDE0213B72B/GxGDE0213B72B.h> // 2.13" b/w
+#include <GxDEPG0213BN/GxDEPG0213BN.h>  // 2.13" b/w newer panel
 
 #include <GxIO/GxIO_SPI/GxIO_SPI.h>
 #include <GxIO/GxIO.h>
@@ -31,7 +31,7 @@ GxEPD_Class display(io, ELINK_RESET, ELINK_BUSY);
 
 #include <WiFi.h>
 #include <HTTPClient.h>
-#include <ArduinoJson.h>
+#include <ArduinoJson.h> //installa versione precedente della 6.20
 #include <time.h>
 #include <DNSServer.h>
 #include <AsyncTCP.h>
@@ -162,6 +162,10 @@ void update_weather_view(View& view, bool data_updated) {
     view.wind = left_pad(String(weather_request.hourly[0].wind_bft), 2);
     view.wind_deg = weather_request.hourly[0].wind_deg;
 
+    view.pop2=weather_request.daily[0].pop2;
+    view.rain2=weather_request.daily[0].rain2;
+
+/*
     for (int i = 0; i < PERCIP_SIZE; i++) {
         view.percip_time[i] = ts2H(weather_request.rain[i].date_ts + datetime_request.response.gmt_offset);
         view.percip_icon[i] = String(icon2meteo_font(weather_request.rain[i].icon));
@@ -175,6 +179,23 @@ void update_weather_view(View& view, bool data_updated) {
 
         // temp TODO rename from percip
         view.percip[i] = fmt_2f1(weather_request.rain[i].feel_t);
+        */
+
+    for (int i = 0; i < PERCIP_SIZE; i++) {
+        view.percip_time[i] = ts2d(weather_request.daily[i].date_ts);
+        view.percip_icon[i] = String(icon2meteo_font(weather_request.daily[i].icon));
+
+        float cumulative_percip = weather_request.daily[i].snow + weather_request.daily[i].rain;
+        if (cumulative_percip > 0) {
+            view.percic_pop[i] = left_pad(fmt_2f1(cumulative_percip), 4);
+        } else {
+            view.percic_pop[i] = left_pad(String(min(weather_request.daily[i].pop, 99)) + "%", 4);
+        }
+
+        // temp TODO rename from percip
+        view.percip[i] = fmt_2f1(weather_request.daily[i].feel_t);
+
+        
     }
 }
 
@@ -222,6 +243,10 @@ void update_forecast_weather(WeatherResponseDaily& daily, JsonObject& root, cons
     daily.pop = round(root["daily"][day_offset]["pop"].as<float>() * 100);
     daily.snow = value_or_default(root["daily"][day_offset], "snow", 0.0f);
     daily.rain = value_or_default(root["daily"][day_offset], "rain", 0.0f);
+    daily.pop2 = round(root["daily"][0]["pop"].as<float>() * 100);
+    daily.rain2 = value_or_default(root["daily"][0], "rain", 0.0f);
+    daily.icon = String(root["daily"][day_offset]["weather"][0]["icon"].as<char*>()).substring(0, 2);  //<------------
+    daily.feel_t = kelv2cels(root["daily"][day_offset]["feels_like"]["day"].as<float>()); //<------------
 }
 
 
@@ -280,13 +305,22 @@ bool weather_handler(WiFiClient& resp_stream, Request request) {
     WeatherResponseHourly& hourly = weather_request.hourly[0];
     WeatherResponseDaily& next_day = weather_request.daily[0];
     WeatherResponseDaily& second_next_day = weather_request.daily[1];
-
+    WeatherResponseDaily& third_next_day = weather_request.daily[2];
+    WeatherResponseDaily& fourth_next_day = weather_request.daily[3];
+    WeatherResponseDaily& fifth_next_day = weather_request.daily[4];
+    
     update_current_weather(hourly, api_resp);
     hourly.print();
     update_forecast_weather(next_day, api_resp, 1);
     next_day.print();
     update_forecast_weather(second_next_day, api_resp, 2);
     second_next_day.print();
+    update_forecast_weather(third_next_day, api_resp, 3);
+    third_next_day.print();
+    update_forecast_weather(fourth_next_day, api_resp, 4);
+    fourth_next_day.print();
+    update_forecast_weather(fifth_next_day, api_resp, 5);
+    fifth_next_day.print();
 
     for (int hour = 0; hour < 5; hour++) {
         int offset = hour + 1;
@@ -884,7 +918,8 @@ int get_mode(bool cached_mode) {
 
 void setup() {
     Serial.begin(115200); 
-    Serial.println("\n\n=== WEATHER STATION ===");
+    Serial.println("=== WEATHER STATION ===");
+    
     init_display();
 
     if (get_mode() == NOT_SET_MODE) {
