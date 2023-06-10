@@ -141,7 +141,7 @@ void init_display() {
     Serial.print("init_display...");
     SPI.begin(SPI_CLK, SPI_MISO, SPI_MOSI, ELINK_SS);
     // enable diagnostic output on Serial 
-    display.init(115200);
+    display.init(); //display.init(115200);
     display.setRotation(3);
     display.setTextWrap(false);
     display.fillScreen(GxEPD_WHITE);
@@ -185,6 +185,13 @@ void display_weather(View& view) {
     display.setFont(&Cousine_Regular6pt7b);
     print_text(30, 24, view.weather_desc);
 
+    //pop pioggia corrente
+    display.setFont(&Cousine_Regular6pt7b);  //<-----------------
+    print_text(130,24,"P : "+ view.pop2 +" %");             //<-----------------
+    //mm pioggia corrente       
+    display.setFont(&Cousine_Regular6pt7b);  //<-----------------
+    print_text(200,24, view.rain2 + " mm");             //<-----------------
+
     display.setFont(&monofonto18pt7b);
     print_text(30, 45, view.temp_curr);
 
@@ -216,7 +223,7 @@ void display_weather(View& view) {
     
     // hourly rain forecast
     display.setFont(&Cousine_Regular6pt7b);
-    print_text(0, 83, view.percip_time_unit);
+    print_text(0, 83, view.percip_time_unit2);
     print_text(0, 98, view.percip_unit);
     print_text(0, 112, view.percic_pop_unit);
 
