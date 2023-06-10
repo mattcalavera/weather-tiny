@@ -30,6 +30,9 @@ struct View {
     String temp_curr = "--";
     String temp_unit = "*";
 
+    String rain2= "---";
+    String pop2= "---";
+
     String pressure = "----";
     String pressure_unit = "hPa";
 
@@ -41,6 +44,7 @@ struct View {
     String aq_pm25_unit = "PM2.5";
 
     String percip_time_unit = "hour";
+    String percip_time_unit2 = "day"; //<----------------
     String percip_unit = "temp";
     String percic_pop_unit = "mm/%";
 
