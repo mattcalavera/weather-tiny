@@ -182,13 +182,18 @@ struct WeatherResponseDaily {
     int min_t;
     int wind_bft;
     int wind_deg;
+    int feel_t;
     int pop;
+    int pop2;
     float snow;
     float rain;
+    float rain2;
+    String icon;
+    String descr;
 
     void print() {
         char buffer[100];
-        Serial.print("Forecast: " + ts2dm(date_ts));
+        Serial.print("ForeKast: " + ts2dm(date_ts));
         sprintf(
             buffer, 
             "%8s %8s %8s %8s %8s %8s %8s",
@@ -199,9 +204,9 @@ struct WeatherResponseDaily {
         Serial.printf("%15s", "");
         sprintf(
             buffer, 
-            "%8d %8d %8d %8d %8d %8s %8s",
+            "%8d %8d %8d %8d %8d %8s %8.1f",
             max_t, min_t, wind_bft, wind_deg, pop,
-            snow? "yes" : "no", rain? "yes" : "no"
+            snow? "yes" : "no", rain //rain? "yes" : "no"
         );
         Serial.println(buffer);
     }
@@ -260,7 +265,7 @@ struct WeatherRequest: Request {
     }
     
     WeatherResponseHourly hourly[1];
-    WeatherResponseDaily daily[2];
+    WeatherResponseDaily daily[5];
     WeatherResponseRainHourly rain[5];
 } ;
 
