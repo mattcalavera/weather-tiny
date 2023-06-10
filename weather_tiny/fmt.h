@@ -93,6 +93,13 @@ String ts2HM(int timestamp) {
     return String(ts_str);
 }
 
+String ts2d(int timestamp) {
+    time_t tm = timestamp;
+    struct tm *now = localtime(&tm);
+    char ts_str[10];
+    strftime(ts_str, sizeof(ts_str), "%d", now);
+    return String(ts_str);
+}
 
 String ts2dm(int timestamp) {
     time_t tm = timestamp;
