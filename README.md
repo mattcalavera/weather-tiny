@@ -2,7 +2,7 @@
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VEJ9YA2MMH9SA)
 
 # Tiny weather station based on TTGO T5 V2.3.1 (ESP32 with 2.13" e-ink display)
-
+# This version has 5 days FORECAST instead of 5 hours
 [<img src="/images/esp-weather-station.jpg" width="440"/>](/images/esp-weather-station.jpg) [<img src="/images/weather_mini.jpg" width="350"/>](/images/weather_mini.jpg) 
 
 ### This project is licensed under GNU General Public License v2.0
